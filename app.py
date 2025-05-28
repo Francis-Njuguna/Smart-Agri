@@ -18,6 +18,11 @@ africastalking.initialize(
     os.getenv('AFRICASTALKING_API_KEY')
 )
 
+@app.route('/')
+def health_check():
+    """Health check endpoint"""
+    return jsonify({"status": "healthy", "message": "Smart Agriculture API is running"}), 200
+
 @app.route('/ussd', methods=['POST'])
 def ussd_callback():
     """Handle USSD requests"""
@@ -70,4 +75,5 @@ def market():
         return str(e), 500
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port) 
