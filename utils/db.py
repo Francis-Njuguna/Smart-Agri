@@ -4,21 +4,30 @@ Database utility functions
 
 import psycopg2
 from psycopg2 import pool
-from config.database import get_db_config
+from config.database import DATABASE_URL
+import time
 
-# Get database configuration
-db_config = get_db_config()
+def create_connection_pool(max_retries=3, retry_delay=5):
+    """Create a connection pool with retries"""
+    for attempt in range(max_retries):
+        try:
+            # Create a connection pool using DATABASE_URL
+            return pool.SimpleConnectionPool(
+                1,  # minconn
+                10,  # maxconn
+                DATABASE_URL
+            )
+        except Exception as e:
+            if attempt < max_retries - 1:
+                print(f"Database connection attempt {attempt + 1} failed: {str(e)}")
+                print(f"Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                print(f"Failed to create database connection pool after {max_retries} attempts")
+                raise e
 
-# Create a connection pool
-connection_pool = pool.SimpleConnectionPool(
-    1,  # minconn
-    10,  # maxconn
-    host=db_config['host'],
-    port=db_config['port'],
-    database=db_config['database'],
-    user=db_config['user'],
-    password=db_config['password']
-)
+# Create the connection pool
+connection_pool = create_connection_pool()
 
 def get_connection():
     """Get a connection from the pool"""
