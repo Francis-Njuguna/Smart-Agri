@@ -4,6 +4,7 @@ Database configuration settings for PostgreSQL
 
 import os
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 load_dotenv()
 
@@ -12,8 +13,15 @@ def get_db_config():
     Get database configuration from environment variables
     """
     if 'DATABASE_URL' in os.environ:
-        # Render PostgreSQL URL
-        return os.environ['DATABASE_URL']
+        # Parse the Render PostgreSQL URL
+        url = urlparse(os.environ['DATABASE_URL'])
+        return {
+            'host': url.hostname,
+            'port': url.port,
+            'database': url.path[1:],  # Remove leading slash
+            'user': url.username,
+            'password': url.password
+        }
     else:
         # Local development configuration
         return {

@@ -4,13 +4,20 @@ Database utility functions
 
 import psycopg2
 from psycopg2 import pool
-from config import DATABASE_URL
+from config.database import get_db_config
+
+# Get database configuration
+db_config = get_db_config()
 
 # Create a connection pool
 connection_pool = pool.SimpleConnectionPool(
     1,  # minconn
     10,  # maxconn
-    DATABASE_URL
+    host=db_config['host'],
+    port=db_config['port'],
+    database=db_config['database'],
+    user=db_config['user'],
+    password=db_config['password']
 )
 
 def get_connection():
