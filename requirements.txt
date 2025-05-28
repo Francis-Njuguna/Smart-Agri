@@ -1,5 +1,5 @@
 flask==2.3.3
-africastalking==0.1.6
+africastalking==1.2.9
 psycopg2-binary==2.9.9
 scikit-learn==1.3.0
 pandas==2.1.0
