@@ -1,45 +1,35 @@
 """
-Database utility functions for PostgreSQL connection handling
+Database utility functions
 """
 
 import psycopg2
 from psycopg2 import pool
-from config.database import DB_CONFIG
+from config import DATABASE_URL
 
 # Create a connection pool
 connection_pool = pool.SimpleConnectionPool(
-    1,  # Minimum connections
-    10,  # Maximum connections
-    host=DB_CONFIG['host'],
-    port=DB_CONFIG['port'],
-    database=DB_CONFIG['database'],
-    user=DB_CONFIG['user'],
-    password=DB_CONFIG['password']
+    1,  # minconn
+    10,  # maxconn
+    DATABASE_URL
 )
 
 def get_connection():
-    """
-    Get a connection from the pool
-    """
+    """Get a connection from the pool"""
     return connection_pool.getconn()
 
 def release_connection(conn):
-    """
-    Release a connection back to the pool
-    """
+    """Release a connection back to the pool"""
     connection_pool.putconn(conn)
 
 def execute_query(query, params=None):
-    """
-    Execute a query and return results
-    """
+    """Execute a query and return the results"""
     conn = None
     try:
         conn = get_connection()
-        with conn.cursor() as cursor:
-            cursor.execute(query, params or ())
-            if cursor.description:  # If it's a SELECT query
-                return cursor.fetchall()
+        with conn.cursor() as cur:
+            cur.execute(query, params)
+            if cur.description:  # If the query returns results
+                return cur.fetchall()
             conn.commit()
             return None
     except Exception as e:

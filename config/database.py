@@ -24,8 +24,8 @@ def get_db_config():
             'password': os.getenv('DB_PASSWORD', '')
         }
 
-# PostgreSQL database configuration
-DB_CONFIG = get_db_config()
-
-# Database connection string
-DATABASE_URL = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}" 
+# Get database URL from environment or construct it
+DATABASE_URL = os.getenv('DATABASE_URL')
+if not DATABASE_URL:
+    db_config = get_db_config()
+    DATABASE_URL = f"postgresql://{db_config['user']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['database']}" 
